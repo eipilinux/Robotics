@@ -11,22 +11,10 @@ import time
 import serial
 import threading
 
-
-moves = {
-    'home': 'MoveJoints(-2.266,6.800,56.742,0.000,-65.000,-0.000)',
-    'over-test': 'MoveJoints(76.443,-13.248,49.473,0.000,-16.267,-1.731)',
-    'on-test': 'MoveJoints(76.443,-13.248,49.473,0.000,-16.267,-1.731)',
-    'output': 'MoveJoints(-1.592,78.828,-69.333,3.495,-11.135,-3.444)'
-}
-
-table_positions = [
-    #50th position for tester modular robot:
-	#[107.758,-267.493,72.726,98.818,-12.561,-88.285]
-]
-
-over_table_positions = [
-	#dont know if i will need this or not
-]
+#these are the x, y, z offsets available to the program to run
+x_adj = 0
+y_adj = 0
+z_adj = 0
 
 estop_state = 0; #default to the welder being on
 
@@ -39,6 +27,28 @@ set_slow_speed = int(input('Slow speed: '))
 
 default_speed = 'SetJointVel(' + str(set_default_speed) + ')'
 slower_pickup_speed = 'SetJointVel(' + str(set_slow_speed) + ')'
+
+static_positions = {
+    'home': 'MoveJoints(-2.266,6.800,56.742,0.000,-65.000,-0.000)',
+    'over-test_1': 'MoveJoints(76.443,-13.248,49.473,0.000,-16.267,-1.731)',
+    'on-test_1': 'MoveJoints(76.443,-13.248,49.473,0.000,-16.267,-1.731)',
+    'over-test_2': 'MoveJoints(76.443,-13.248,49.473,0.000,-16.267,-1.731)',
+    'on-test_2': 'MoveJoints(76.443,-13.248,49.473,0.000,-16.267,-1.731)',
+    'output': 'MoveJoints(-1.592,78.828,-69.333,3.495,-11.135,-3.444)'
+}
+
+def generate_nth_position(i, z_increase):
+	dist_between_parts = 27.719
+	start_pos_x = -140.892 + x_adj
+	start_pos_y = -154.393 + y_adj
+	start_pos_z = 72.726 + z_adj
+	orientation_data = '98.818,-12.561,-88.285)'
+	header_string = 'MovePose('
+	x_offset = (i % 10) * dist_between_parts
+	y_offset = (i // 10) * -1 * dist_between_parts
+	z_offset = z_increase
+	position_n = header_string + str(round(start_pos_x + x_offset, 3)) + ',' + str(round(start_pos_y + y_offset, 3)) + ',' + str(round(start_pos_z + z_offset, 3)) + ',' + orientation_data
+	return position_n
 
 def connect_robot(ip, port, name_of_robot):
     try:
@@ -127,7 +137,6 @@ def check_estop(com):
             else:
                 time.sleep(0.05)
     #end of check for estop 
-
 def move_to(robot, position):
     #check estop
     check_estop(com)
@@ -213,7 +222,6 @@ def put_valve_into_welder(robot):
     move_to(robot, moves['over_welder'])
     move_to(robot, moves['pre-weld'])
     #move_to(robot, moves['home'])
-
 def get_valve_from_welder(robot):
     #move_to(robot, moves['pre-weld'])
     #move_to(robot, moves['ready_to_bop'])
