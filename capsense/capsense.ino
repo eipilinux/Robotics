@@ -16,7 +16,7 @@ int capSensePin = 2;
 //  by trial and error, or you could take readings at 
 //  the start of the program to dynamically calculate this.
 // If this is not sensitive enough, try a resistor with more ohms.
-int touchedCutoff = 43;
+int touchedCutoff = 100;
 
 void setup(){
   Serial.begin(9600);
