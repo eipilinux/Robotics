@@ -203,12 +203,12 @@ def start_welder(com):
             time.sleep(0.0)
 
 def get_valve_from_table(robot, index):
-    move_to(robot, over_table_positions[index])
+    move_to(robot, generate_nth_position(index, 60))
     open_gripper(robot)
     robot.send(bytes(slower_pickup_speed+'\0','ascii'))
-    move_to(robot, table_positions[index])
+    move_to(robot, generate_nth_position(index, 0))
     close_gripper(robot)
-    move_to(robot, over_table_positions[index])
+    move_to(robot, generate_nth_position(index, 60))
     robot.send(bytes(default_speed+'\0','ascii'))
     move_to(robot, moves['home'])
 
