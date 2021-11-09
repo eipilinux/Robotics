@@ -247,6 +247,8 @@ comport = '/dev/ttyACM0'
 com = connect_control(comport, 9600)
 walle = connect_robot("192.168.0.101", 10000, 'walle')
 
+# connection protocol using the connected robot arduino to test what the heck is around to connect to somehow
+
 while True:
     user_time_start = time.time()
     print('\nReady for next set')
