@@ -32,7 +32,7 @@ void setup(){
   if(digitalRead(solo_fail) == LOW){
     SOLO_STATE = 0;
     digitalWrite(alarm, HIGH);
-    delay(200);
+    delay(500);
     digitalWrite(alarm, LOW);
   }
   else if(digitalRead(solo_pass) == LOW){
@@ -60,7 +60,7 @@ void loop(){
       if(digitalRead(solo_fail) == LOW || digitalRead(solo_pass) == HIGH){
         Serial.println("Fail");
         digitalWrite(alarm, HIGH);
-        delay(200);
+        delay(500);
         digitalWrite(alarm, LOW);
       }
       else if(digitalRead(solo_pass) == LOW)
