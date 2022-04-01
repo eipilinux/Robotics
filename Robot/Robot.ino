@@ -1,3 +1,61 @@
+int homepos = 1;
+
+void setup() {
+  Serial.begin(9600);
+  /*
+   * pin 7 ---> Tester 1 Pass
+   * pin 6 ---> Tester 
+   * pin 5 ---> Tester 
+   * pin 4 ---> Tester 
+   * pin 3 ---> Tester 
+   * pin 2 ---> Tester 
+   * pin 9 ---> Welder Home Button
+   * pin 8 ---> Welder Start (HIGH signal starts welder, This pin needs to be set HIGH for at least 0.500 seconds to activate welder)
+   */
+}
+
+// the loop function runs over and over again forever
+void loop() {
+  if(digitalRead(8) == HIGH && homepos == 0){
+    Serial.println("Home");
+    homepos = 1;
+    delay(20);
+  }
+  if(digitalRead(8) == LOW && homepos == 1){
+    homepos = 0;
+    delay(20);
+  }
+
+//new section
+  if(digitalRead(3) == LOW && estop == 1){
+    Serial.println("estop");
+    estop = 0;
+    delay(20);
+  }
+  if(digitalRead(3) == HIGH && estop == 0){
+    Serial.println("resume");
+    estop = 1;
+    delay(20);
+  }
+//
+ 
+  if (Serial.available() > 0) {
+    // read the incoming byte:
+    byte incomingByte = Serial.read();
+    if(incomingByte == 49){
+      digitalWrite(7, HIGH);
+      //Serial.println("Received");
+      delay(1000);
+      digitalWrite(7, LOW);
+    }
+  }
+}
+
+
+
+
+
+
 //data transfer variables
 int incomingByte = 0; // for incoming serial data
 
@@ -16,14 +74,6 @@ const int solo_2_pass = A3;
 const int solo_2_start = 3;
 int SOLO_2_READY = 0; // is HIGH if the system is ready for a new part and LOW while testing
 int SOLO_2_STATE = 0; // holds a PASS or FAIL value
-
-//solo unit 3 (single disk)
-const int solo_3_end = A1;
-const int solo_3_fail = 13;
-const int solo_3_pass = A0;
-const int solo_3_start = 4;
-int SOLO_3_READY; // is HIGH if the system is ready for a new part and LOW while testing
-int SOLO_3_STATE; // holds a PASS or FAIL value
 
 const int table_home = A5;
 int TABLE_STATE;
