@@ -75,6 +75,7 @@ void loop() {
 
   //check solo tester 1
   if( SOLO_1_READY == 0 && digitalRead(solo_1_end) == HIGH){
+    Serial.println("we did cycle tester 1");
     if(digitalRead(solo_1_pass) == LOW)
       Serial.println("1 Fail");
     else if(digitalRead(solo_1_pass) == HIGH)
@@ -87,6 +88,7 @@ void loop() {
 
   //check solo tester 2
   if( SOLO_2_READY == 0 && digitalRead(solo_2_end) == HIGH){
+    Serial.println("we did cycle tester 2");
     if(digitalRead(solo_2_pass) == LOW)
       Serial.println("2 Fail");
     else if(digitalRead(solo_2_pass) == HIGH)
@@ -105,8 +107,9 @@ void loop() {
     //if the control computer sent 'W' (byte value of 87) then start the welder
     if(incomingByte == 87){
       digitalWrite(welder_start, HIGH);
-      Serial.println("Started Welder");
-      delay(700);
+      Serial.println("Welder Active");
+      WELDER_STATE = 1;
+      delay(1000);
       digitalWrite(welder_start, LOW);
     }
 
@@ -116,6 +119,7 @@ void loop() {
       Serial.println("Started Tester 1");
       delay(20);
       digitalWrite(solo_1_start, LOW);
+      SOLO_1_READY = 0;
     }
 
     //if the control computer sent '2' (byte value of 50) then start tester 2
@@ -124,6 +128,7 @@ void loop() {
       Serial.println("Started Tester 2");
       delay(20);
       digitalWrite(solo_2_start, LOW);
+      SOLO_2_READY = 0;
     }
   } //end of serial.available{}
 } //end of void loop{}
