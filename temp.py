@@ -205,7 +205,7 @@ def put_part_into_tester_1(robot, comport):
 	move_to(robot, static_positions['second_robot_on_tester1'])
 	open_gripper(robot)
 	move_to(robot, static_positions['second_robot_over_tester1'])
-	comport.write('1'.encode())
+	comport.write('2'.encode())
 	move_to(robot, static_positions['second_robot_middle_testers'])
 	move_to(robot, static_positions['second_robot_home'])
 
@@ -215,14 +215,14 @@ def put_part_into_tester_2(robot, comport):
 	move_to(robot, static_positions['second_robot_on_tester2'])
 	open_gripper(robot)
 	move_to(robot, static_positions['second_robot_over_tester2'])
-	comport.write('2'.encode())
+	comport.write('1'.encode())
 	move_to(robot, static_positions['second_robot_middle_testers'])
 	move_to(robot, static_positions['second_robot_home'])
 
 def put_in_correct_output(robot, pass_or_fail_value):
 	if pass_or_fail_value == 1:
 		move_to(robot, static_positions['second_robot_good_output'])
-	else if pass_or_fail_value == 0:
+	else: #if pass_or_fail_value == 0:
 		move_to(robot, static_positions['second_robot_bad_output'])
 	open_gripper(robot)
 	move_to(robot, static_positions['second_robot_home'])
@@ -287,17 +287,21 @@ while True:
 	for i in range(num_cycles):
 		print("getting part #: " + str(i) + '\n')
 		put_part_into_welder_start_welder_and_get_next_part(walle, i, comport)
-		get_part_from_welder(roger)
 		if i % 2 == 1:
-			put_part_into_tester_1(roger, comport)
 			if i > 1:
 				get_part_from_tester_2(roger)
 				put_in_correct_output(roger, 1)
+
+			get_part_from_welder(roger)
+			put_part_into_tester_1(roger, comport)
+
 		else:
-			put_part_into_tester_2(roger, comport)
 			if i > 1:
 				get_part_from_tester_1(roger)
 				put_in_correct_output(roger, 1)
+
+			get_part_from_welder(roger)
+			put_part_into_tester_2(roger, comport)
 
 
 	end = time.time()
