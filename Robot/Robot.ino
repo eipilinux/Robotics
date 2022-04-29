@@ -1,10 +1,10 @@
 /*
 * 
-* pin 7 ---> Tester 1 Pass (Pin is an input pin that will go HIGH when tester 1 cycle passes)
-* pin 6 ---> Tester 1 Cycle End (Pin is an input pin that will go HIGH when tester 1 cycle ends)
+* pin 7 ---> Tester 1 Pass (Pin is an input pin that will go LOW when tester 1 cycle passes)
+* pin 6 ---> Tester 1 Cycle End (Pin is an input pin that will go LOW when tester 1 cycle ends)
 * 
-* pin 5 ---> Tester 2 Pass (Pin is an input pin that will go HIGH when tester 2 cycle passes)
-* pin 4 ---> Tester 2 Cycle End (Pin is an input pin that will go HIGH when tester 2 cycle ends)
+* pin 5 ---> Tester 2 Pass (Pin is an input pin that will go LOW when tester 2 cycle passes)
+* pin 4 ---> Tester 2 Cycle End (Pin is an input pin that will go LOW when tester 2 cycle ends)
 * 
 * pin 2 ---> Tester 1 Start (HIGH signal starts tester 1, This pin needs to be set HIGH for at least 0.020 seconds to activate tester)
 * pin 3 ---> Tester 2 Start (HIGH signal starts tester 2, This pin needs to be set HIGH for at least 0.020 seconds to activate tester)
@@ -57,6 +57,16 @@ void setup() {
   pinMode(solo_2_pass, INPUT);
 
   pinMode(welder_home, INPUT);
+
+  int SOLO_1_READY = 1; 
+  int SOLO_2_READY = 1; 
+//  Serial.println("initializing...");
+//  delay(5000);
+//  Serial.println("System Ready");
+//  Serial.println(digitalRead(solo_1_pass));
+//  Serial.println(digitalRead(solo_2_pass));
+//  Serial.println(digitalRead(solo_1_end));
+//  Serial.println(digitalRead(solo_2_end));
 } //end of void setup{}
 
 void loop() {
@@ -74,28 +84,26 @@ void loop() {
   }
 
   //check solo tester 1
-  if( SOLO_1_READY == 0 && digitalRead(solo_1_end) == HIGH){
-    Serial.println("we did cycle tester 1");
-    if(digitalRead(solo_1_pass) == LOW)
+  if( SOLO_1_READY == 0 && digitalRead(solo_1_end) == LOW){
+    if(digitalRead(solo_1_pass) == HIGH)
       Serial.println("1 Fail");
-    else if(digitalRead(solo_1_pass) == HIGH)
+    else if(digitalRead(solo_1_pass) == LOW)
       Serial.println("1 Pass");
     SOLO_1_READY = 1;
   }
-  else if( SOLO_1_READY == 1 && digitalRead(solo_1_end) == LOW){
+  else if( SOLO_1_READY == 1 && digitalRead(solo_1_end) == HIGH){
     SOLO_1_READY = 0;
   }
 
   //check solo tester 2
-  if( SOLO_2_READY == 0 && digitalRead(solo_2_end) == HIGH){
-    Serial.println("we did cycle tester 2");
-    if(digitalRead(solo_2_pass) == LOW)
+  if( SOLO_2_READY == 0 && digitalRead(solo_2_end) == LOW){
+    if(digitalRead(solo_2_pass) == HIGH)
       Serial.println("2 Fail");
-    else if(digitalRead(solo_2_pass) == HIGH)
+    else if(digitalRead(solo_2_pass) == LOW)
       Serial.println("2 Pass");
     SOLO_2_READY = 1;
   }
-  else if( SOLO_2_READY == 1 && digitalRead(solo_2_end) == LOW){
+  else if( SOLO_2_READY == 1 && digitalRead(solo_2_end) == HIGH){
     SOLO_2_READY = 0;
   }
   
@@ -119,7 +127,7 @@ void loop() {
       Serial.println("Started Tester 1");
       delay(20);
       digitalWrite(solo_1_start, LOW);
-      SOLO_1_READY = 0;
+      //SOLO_1_READY = 0;
     }
 
     //if the control computer sent '2' (byte value of 50) then start tester 2
@@ -128,7 +136,7 @@ void loop() {
       Serial.println("Started Tester 2");
       delay(20);
       digitalWrite(solo_2_start, LOW);
-      SOLO_2_READY = 0;
+      //SOLO_2_READY = 0;
     }
   } //end of serial.available{}
 } //end of void loop{}

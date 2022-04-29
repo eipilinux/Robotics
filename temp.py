@@ -199,20 +199,50 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 				break
 		time.sleep(0.05)
 
-def put_part_into_tester_1(robot):
+def put_part_into_tester_1(robot, comport):
 	move_to(robot, static_positions['second_robot_middle_testers'])
 	move_to(robot, static_positions['second_robot_over_tester1'])
 	move_to(robot, static_positions['second_robot_on_tester1'])
 	open_gripper(robot)
 	move_to(robot, static_positions['second_robot_over_tester1'])
+	comport.write('1'.encode())
 	move_to(robot, static_positions['second_robot_middle_testers'])
 	move_to(robot, static_positions['second_robot_home'])
 
-def put_part_into_tester_2(robot):
+def put_part_into_tester_2(robot, comport):
 	move_to(robot, static_positions['second_robot_middle_testers'])
 	move_to(robot, static_positions['second_robot_over_tester2'])
 	move_to(robot, static_positions['second_robot_on_tester2'])
 	open_gripper(robot)
+	move_to(robot, static_positions['second_robot_over_tester2'])
+	comport.write('2'.encode())
+	move_to(robot, static_positions['second_robot_middle_testers'])
+	move_to(robot, static_positions['second_robot_home'])
+
+def put_in_correct_output(robot, pass_or_fail_value):
+	if pass_or_fail_value == 1:
+		move_to(robot, static_positions['second_robot_good_output'])
+	else if pass_or_fail_value == 0:
+		move_to(robot, static_positions['second_robot_bad_output'])
+	open_gripper(robot)
+	move_to(robot, static_positions['second_robot_home'])
+
+def get_part_from_tester_1(robot):
+	open_gripper(robot)
+	move_to(robot, static_positions['second_robot_middle_testers'])
+	move_to(robot, static_positions['second_robot_over_tester1'])
+	move_to(robot, static_positions['second_robot_on_tester1'])
+	close_gripper(robot)
+	move_to(robot, static_positions['second_robot_over_tester1'])
+	move_to(robot, static_positions['second_robot_middle_testers'])
+	move_to(robot, static_positions['second_robot_home'])
+
+def get_part_from_tester_2(robot):
+	open_gripper(robot)
+	move_to(robot, static_positions['second_robot_middle_testers'])
+	move_to(robot, static_positions['second_robot_over_tester2'])
+	move_to(robot, static_positions['second_robot_on_tester2'])
+	close_gripper(robot)
 	move_to(robot, static_positions['second_robot_over_tester2'])
 	move_to(robot, static_positions['second_robot_middle_testers'])
 	move_to(robot, static_positions['second_robot_home'])
@@ -244,16 +274,42 @@ roger = connect_robot("192.168.0.100", 10000, 'roger')
 move_to(walle, static_positions['home'])
 move_to(roger, static_positions['second_robot_home'])
 
-for i in range(50):
-	print("getting part #: " + str(i))
-	put_part_into_welder_start_welder_and_get_next_part(walle, i, comport)
-	get_part_from_welder(roger)
-	if i % 2 == 1:
-		put_part_into_tester_1(roger)
-	else:
-		put_part_into_tester_2(roger)
 
-	
+while True:
+    user_time_start = time.time()
+    print('\nReady for next set')
+    num_cycles = 50#int(input('How many valves to make: '))
+    next = input('Press enter to continue')
+    
+    start = time.time()
+
+
+	for i in range(num_cycles):
+		print("getting part #: " + str(i) + '\n')
+		put_part_into_welder_start_welder_and_get_next_part(walle, i, comport)
+		get_part_from_welder(roger)
+		if i % 2 == 1:
+			put_part_into_tester_1(roger, comport)
+			if i > 1:
+				get_part_from_tester_2(roger)
+				put_in_correct_output(roger, 1)
+		else:
+			put_part_into_tester_2(roger, comport)
+			if i > 1:
+				get_part_from_tester_1(roger)
+				put_in_correct_output(roger, 1)
+
+
+	end = time.time()
+    print('the last: ' + str(num_cycles) + ' valves took: ' + str(end - start) + ' seconds for the robot to complete\n')
+    print('and ' + str(start - user_time_start) + ' for the board flip and reload\n')
+    print('total production time was: ' + str(end - user_time_start) + '\n')
+    outfile = open('partslog.txt', 'a')
+    outfile.write('50 @ time: ' + str(end) + ' total production time was: ' 
+                    + str(end - user_time_start) + ' robot took: ' + str(end - start) 
+                    + ' seconds and user took: ' + str(start - user_time_start) + '\n')
+    outfile.close()
+
 
 time.sleep(3)
 disconnect_robot(walle)
