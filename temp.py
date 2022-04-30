@@ -289,7 +289,7 @@ while True:
 		put_part_into_welder_start_welder_and_get_next_part(walle, i, comport)
 		if i % 2 == 1:
 			if i > 1:
-				get_part_from_tester_2(roger)
+				get_part_from_tester_1(roger)
 				put_in_correct_output(roger, 1)
 
 			get_part_from_welder(roger)
@@ -297,7 +297,7 @@ while True:
 
 		else:
 			if i > 1:
-				get_part_from_tester_1(roger)
+				get_part_from_tester_2(roger)
 				put_in_correct_output(roger, 1)
 
 			get_part_from_welder(roger)
