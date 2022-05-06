@@ -166,6 +166,8 @@ def disconnect_robot(robot):
         print('Failed to disconnect') 
 
 def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
+	global tester_1_pass_or_fail
+	global tester_2_pass_or_fail
 	if i == 0:
 		open_gripper(robot)
 		move_to(robot, generate_nth_position(i, 100))
@@ -199,8 +201,15 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 			line = comport.readline()
 			info = line.strip().decode('utf-8')
 			if info == "Welder Home":
-				comport.reset_input_buffer()
 				break
+			elif info == "1 Pass":
+				tester_1_pass_or_fail = 1
+			elif info == "1 Fail":
+				tester_1_pass_or_fail = 0
+			elif info == "2 Pass":
+				tester_2_pass_or_fail = 1
+			elif info == "2 Fail":
+				tester_2_pass_or_fail = 0
 		time.sleep(0.05)
 
 def put_part_into_tester_1(robot, comport):
@@ -282,7 +291,7 @@ def get_serial_status(comport):
 			tester_2_pass_or_fail = 1
 		elif info == "2 Fail":
 			tester_2_pass_or_fail = 0
-		
+
 		
 			
 
