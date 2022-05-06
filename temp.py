@@ -8,6 +8,10 @@ x_adj = 0
 y_adj = 0
 z_adj = 0
 
+tester_1_pass_or_fail = 12
+tester_2_pass_or_fail = 12
+
+
 delay_set = True
 
 static_positions = {
@@ -43,7 +47,7 @@ def generate_nth_position(i, z_increase):
 	dist_between_parts = 27.719
 	start_pos_x = 125.703 + x_adj
 	start_pos_y = 176.158 + y_adj
-	start_pos_z = 105.115 + z_adj   #70.729
+	start_pos_z = 75.115 + z_adj   #70.729 this used to be 105.115 before
 	orientation_data = '-89.553,-0.079,89.288)'
 	header_string = 'MovePose('
 	x_offset = (i % 10) * dist_between_parts * -1.0
@@ -258,11 +262,29 @@ def get_part_from_welder(robot):
 
 def connect_control(serial_port, baud_rate):
 	ser = serial.Serial(serial_port, baud_rate, timeout=1)
-	time.sleep(2)
+	time.sleep(15)
 	ser.reset_input_buffer()
 	print('connected to control unit\n')
 	return ser
 
+def get_serial_status(comport):
+	global tester_1_pass_or_fail
+	global tester_2_pass_or_fail
+	while comport.in_waiting:
+		line = comport.readline()
+		info = line.strip().decode('utf-8')
+		print(info)
+		if info == "1 Pass":
+			tester_1_pass_or_fail = 1
+		elif info == "1 Fail":
+			tester_1_pass_or_fail = 0
+		elif info == "2 Pass":
+			tester_2_pass_or_fail = 1
+		elif info == "2 Fail":
+			tester_2_pass_or_fail = 0
+		
+		
+			
 
 
 control_port = '/dev/cu.usbmodem11201' #'/dev/ttyACM0'
@@ -286,6 +308,7 @@ while True:
 
 	for i in range(num_cycles):
 		print("getting part #: " + str(i) + '\n')
+		get_serial_status(comport)
 		put_part_into_welder_start_welder_and_get_next_part(walle, i, comport)
 		if i % 2 == 1:
 			if i > 1:
