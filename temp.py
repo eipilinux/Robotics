@@ -3,6 +3,8 @@ import socket
 import time
 import serial
 import threading
+from datetime import date
+
 
 x_adj = 0
 y_adj = 0
@@ -15,26 +17,31 @@ tester_2_pass_or_fail = 12
 delay_set = True
 
 static_positions = {
-    'home': 'MoveJoints(-2.266,6.800,56.742,0.000,-65.000,-0.000)',
-    'ready_for_welder': 'MovePose(-14.113,-174.370,242.565,88.859,-1.310,-90.121)',
-    'over_welder': 'MovePose(-12.113,-232.970,229.865,88.859,-1.310,-90.121)',
-    'on_welder': 'MovePose(-12.113,-232.970,204.165,88.859,-1.310,-90.121)',
-    #second robot info
-    'second_robot_home': 'MovePose(210.863,0.000,203.081,-0.000,89.046,0.000)',
-    'second_robot_middle_testers': 'MovePose(-0.000,-142.363,203.081,89.046,-0.000,-90.000)',
-    'second_robot_ready_for_welder': 'MovePose(-11.235,172.668,221.783,-89.045,-1.360,90.023)',
-    'second_robot_over_welder': 'MovePose(-13.935,236.348,188.333,-89.045,-1.360,90.023)',
-    'second_robot_on_welder': 'MovePose(-13.935,236.348,158.583,-89.045,-1.360,90.023)',
-    'second_robot_over_tester1': 'MovePose(89.000,-146.963,159.581,89.046,0.000,-90.000)',
-    'second_robot_on_tester1': 'MovePose(89.000,-146.963,126.581,89.046,-0.000,-90.000)',
-    'second_robot_over_tester2': 'MovePose(-120.025,-146.338,155.931,89.046,0.000,-90.000)',
-    'second_robot_on_tester2': 'MovePose(-120.025,-146.338,125.056,89.046,0.000,-90.000)',
-    'second_robot_good_output': 'MovePose(321.621,13.585,155.933,-64.863,87.753,64.880)',
-    'second_robot_bad_output': 'MovePose(-8.575,-311.313,155.931,89.046,0.000,-90.000)'
+	'home': 'MoveJoints(-2.266,6.800,56.742,0.000,-65.000,-0.000)',
+	'ready_for_welder': 'MovePose(-14.113,-174.370,242.565,88.859,-1.310,-90.121)',
+	'over_welder': 'MovePose(-12.113,-232.970,229.865,88.859,-1.310,-90.121)',
+	'on_welder': 'MovePose(-12.113,-232.970,204.165,88.859,-1.310,-90.121)',
+	#second robot info
+	'second_robot_home': 'MovePose(210.863,0.000,203.081,-0.000,89.046,0.000)',
+	'second_robot_middle_testers': 'MovePose(-0.000,-142.363,203.081,89.046,-0.000,-90.000)',
+	'second_robot_ready_for_welder': 'MovePose(-11.235,172.668,221.783,-89.045,-1.360,90.023)',
+	'second_robot_over_welder': 'MovePose(-13.935,236.348,188.333,-89.045,-1.360,90.023)',
+	'second_robot_on_welder': 'MovePose(-13.935,236.348,158.583,-89.045,-1.360,90.023)',
+	'second_robot_over_tester1': 'MovePose(89.000,-146.963,159.581,89.046,0.000,-90.000)',
+	'second_robot_on_tester1': 'MovePose(89.000,-146.963,126.581,89.046,-0.000,-90.000)',
+	'second_robot_over_tester2': 'MovePose(-120.025,-146.338,155.931,89.046,0.000,-90.000)',
+	'second_robot_on_tester2': 'MovePose(-120.025,-146.338,125.056,89.046,0.000,-90.000)',
+	'second_robot_good_output': 'MovePose(321.621,13.585,155.933,-64.863,87.753,64.880)',
+	'second_robot_bad_output': 'MovePose(-8.575,-311.313,155.931,89.046,0.000,-90.000)'
 }
 
+print("Today's date:", today)
 set_default_speed = int(input('Default speed: '))
-set_slow_speed = int(input('Slow speed: '))
+#set_slow_speed = int(input('Slow speed: '))
+part_type_info = input('Enter the product name: ')
+output_file_descriptor1 = input('Enter the MO #: ')
+output_file_descriptor2 = input('Enter the Lot #: ')
+date_info_today = date.today()
 
 default_speed = 'SetJointVel(' + str(set_default_speed) + ')'
 slower_pickup_speed = 'SetJointVel(' + str(set_slow_speed) + ')'
@@ -47,7 +54,7 @@ def generate_nth_position(i, z_increase):
 	dist_between_parts = 27.719
 	start_pos_x = 125.703 + x_adj
 	start_pos_y = 176.158 + y_adj
-	start_pos_z = 75.115 + z_adj   #70.729 this used to be 105.115 before
+	start_pos_z = 95.115 + z_adj   #70.729 this used to be 105.115 before
 	orientation_data = '-89.553,-0.079,89.288)'
 	header_string = 'MovePose('
 	x_offset = (i % 10) * dist_between_parts * -1.0
@@ -67,103 +74,118 @@ def generate_nth_position(i, z_increase):
 	return position_n
 
 def connect_robot(ip, port, name_of_robot):
-    try:
-        robot_socket_connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error:
-        print('Failed to create socket for robot at: ' + ip)
-        return -1
+	try:
+		robot_socket_connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	except socket.error:
+		print('Failed to create socket for robot at: ' + ip)
+		return -1
 
-    print('Socket Created for ' + name_of_robot +  ' at: ' + ip)
-    #log_file.write('Socket Created for ' + name_of_robot +  ' at: ' + ip + '\n')
+	print('Socket Created for ' + name_of_robot +  ' at: ' + ip)
+	#log_file.write('Socket Created for ' + name_of_robot +  ' at: ' + ip + '\n')
 
-    robot_socket_connection.connect((ip, port))
+	robot_socket_connection.connect((ip, port))
 
-    print('Socket Connected to robot at: ' + ip)
-    #log_file.write('Socket Connected to robot at: ' + ip + '\n')
+	print('Socket Connected to robot at: ' + ip)
+	#log_file.write('Socket Connected to robot at: ' + ip + '\n')
 
-    response = robot_socket_connection.recv(1024).decode('ascii')
-    print(response)
+	response = robot_socket_connection.recv(1024).decode('ascii')
+	print(response)
 
-    try:
-        robot_socket_connection.send(bytes('ActivateRobot'+'\0','ascii'))
-        if delay_set == True:
-            time.sleep(15)
-        response = robot_socket_connection.recv(1024).decode('ascii')
-        print(response) 
-    except socket.error:
-        print('Failed to Activate robot at: ' + ip)
-        return -1
+	try:
+		robot_socket_connection.send(bytes('ActivateRobot'+'\0','ascii'))
+		if delay_set == True:
+			time.sleep(15)
+		response = robot_socket_connection.recv(1024).decode('ascii')
+		print(response) 
+	except socket.error:
+		print('Failed to Activate robot at: ' + ip)
+		return -1
 
-    try:
-        robot_socket_connection.send(bytes('Home'+'\0','ascii'))
-        response = robot_socket_connection.recv(1024).decode('ascii')
-        print(response)
-    except socket.error:
-        print('Failed to home robot at: ' + ip)
-        return -1
+	try:
+		robot_socket_connection.send(bytes('Home'+'\0','ascii'))
+		response = robot_socket_connection.recv(1024).decode('ascii')
+		print(response)
+	except socket.error:
+		print('Failed to home robot at: ' + ip)
+		return -1
 
-    try:
-        robot_socket_connection.send(bytes(default_speed+'\0','ascii'))
-        response = robot_socket_connection.recv(1024).decode('ascii')
-        #print(response)
-    except socket.error:
-        print('Failed to set joint velocity for robot at: ' + ip)
-        return -1
+	try:
+		robot_socket_connection.send(bytes(default_speed+'\0','ascii'))
+		response = robot_socket_connection.recv(1024).decode('ascii')
+		#print(response)
+	except socket.error:
+		print('Failed to set joint velocity for robot at: ' + ip)
+		return -1
 
-    try:
-        robot_socket_connection.send(bytes('MoveJoints(0,0,0,0,16.5,0)'+'\0','ascii'))
-        response = robot_socket_connection.recv(1024).decode('ascii')
-        robot_socket_connection.send(bytes('gripperopen()'+'\0','ascii'))
-        response = robot_socket_connection.recv(1024).decode('ascii')
-        #print(response)
-    except socket.error:
-        print('Failed to go to neutral position for robot at: ' + ip)
-        return -1
+	try:
+		robot_socket_connection.send(bytes('ResetError'+'\0','ascii'))
+		robot_socket_connection.send(bytes('ClearMotion'+'\0','ascii'))
+		robot_socket_connection.send(bytes('PauseMotion'+'\0','ascii'))
+		robot_socket_connection.send(bytes('MoveJoints(0,0,0,0,16.5,0)'+'\0','ascii'))
+		response = robot_socket_connection.recv(1024).decode('ascii')
+		robot_socket_connection.send(bytes('gripperopen()'+'\0','ascii'))
+		response = robot_socket_connection.recv(1024).decode('ascii')
+		#print(response)
+	except socket.error:
+		print('Failed to go to neutral position for robot at: ' + ip)
+		return -1
 
-    print('\n')
-    return robot_socket_connection
+	print('\n')
+	return robot_socket_connection
 
 def move_to(robot, position):
-    # #check estop
-    # check_estop(com)
-    try:
-        robot.send(bytes(position+'\0','ascii'))
-        #response = robot.recv(1024).decode('ascii')
-        #print(response)
-    except socket.error:
-        print('Failed to move robot')
-    return 0
+	#check estop
+	  #   while comport.in_waiting:
+			# line = comport.readline()
+			# info = line.strip().decode('utf-8')
+			# print(info)
+			# if info == "1 Pass":
+			# 	tester_1_pass_or_fail = 1
+			# elif info == "1 Fail":
+			# 	tester_1_pass_or_fail = 0
+			# elif info == "2 Pass":
+			# 	tester_2_pass_or_fail = 1
+			# elif info == "2 Fail":
+			# 	tester_2_pass_or_fail = 0
+	try:
+		robot.send(bytes(position+'\0','ascii'))
+		#response = robot.recv(1024).decode('ascii')
+		#print(response)
+	except socket.error:
+		print('Failed to move robot, exiting...')
+		sys.exit()
+		return 0
 
 def open_gripper(robot):
-    try:
-        robot.send(bytes('gripperopen'+'\0','ascii'))
-        response = robot.recv(1024).decode('ascii')
-        robot.send(bytes('delay(0.1)'+'\0','ascii'))
-        response = robot.recv(1024).decode('ascii')
-        #print(response)
-        time.sleep(.1)
-    except socket.error:
-        print('Failed to open gripper')
-        
+	try:
+		robot.send(bytes('gripperopen'+'\0','ascii'))
+		response = robot.recv(1024).decode('ascii')
+		robot.send(bytes('delay(0.1)'+'\0','ascii'))
+		response = robot.recv(1024).decode('ascii')
+		#print(response)
+		time.sleep(.1)
+	except socket.error:
+		print('Failed to open gripper')
+
 def close_gripper(robot):
-    try:
-        robot.send(bytes('gripperclose'+'\0','ascii'))
-        response = robot.recv(1024).decode('ascii')
-        robot.send(bytes('delay(0.1)'+'\0','ascii'))
-        response = robot.recv(1024).decode('ascii')
-        #print(response)
-        time.sleep(.1)
-    except socket.error:
-        print('Failed to close gripper')
+	try:
+		robot.send(bytes('gripperclose'+'\0','ascii'))
+		response = robot.recv(1024).decode('ascii')
+		robot.send(bytes('delay(0.1)'+'\0','ascii'))
+		response = robot.recv(1024).decode('ascii')
+		#print(response)
+		time.sleep(.1)
+	except socket.error:
+		print('Failed to close gripper')
 
 def disconnect_robot(robot):
-    try:
-        robot.send(bytes('DeactivateRobot'+'\0','ascii'))
-        response = robot.recv(1024).decode('ascii')
-        print(response) 
-        #robot.close() 
-    except socket.error:
-        print('Failed to disconnect') 
+	try:
+		robot.send(bytes('DeactivateRobot'+'\0','ascii'))
+		response = robot.recv(1024).decode('ascii')
+		print(response) 
+		#robot.close() 
+	except socket.error:
+		print('Failed to disconnect') 
 
 def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 	global tester_1_pass_or_fail
@@ -210,6 +232,7 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 				tester_2_pass_or_fail = 1
 			elif info == "2 Fail":
 				tester_2_pass_or_fail = 0
+
 		time.sleep(0.05)
 
 def put_part_into_tester_1(robot, comport):
@@ -305,14 +328,26 @@ roger = connect_robot("192.168.0.100", 10000, 'roger')
 move_to(walle, static_positions['home'])
 move_to(roger, static_positions['second_robot_home'])
 
+log_file_name_and_location = 'Desktop/' + part_type_info + '_MO' + output_file_descriptor1 + '_LOT' + output_file_descriptor2 + '_DATE' + date_info_today + '_partslog.txt'
+
 
 while True:
-    user_time_start = time.time()
-    print('\nReady for next set')
-    num_cycles = 50#int(input('How many valves to make: '))
-    next = input('Press enter to continue')
-    
-    start = time.time()
+	user_time_start = time.time()
+	comport.write('Alarm On'.encode())
+	print('\nReady for next set')
+	num_cycles = 50#int(input('How many valves to make: '))
+	next = input('Press enter to continue')
+
+
+	start = time.time()
+	comport.reset_input_buffer()
+
+
+	outfile = open(log_file_name_and_location, 'a')
+	outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
+	outfile.write('Production started: ' + date_info_today + ' at time: ' + start + '\n' + '\n')
+	outfile.close()
+	comport.write('Alarm Off'.encode())
 
 
 	for i in range(num_cycles):
@@ -322,7 +357,10 @@ while True:
 		if i % 2 == 1:
 			if i > 1:
 				get_part_from_tester_1(roger)
+				while tester_1_pass_or_fail == 12:
+					get_serial_status(comport)
 				put_in_correct_output(roger, tester_1_pass_or_fail)
+				tester_1_pass_or_fail = 12
 
 			get_part_from_welder(roger)
 			put_part_into_tester_1(roger, comport)
@@ -330,21 +368,24 @@ while True:
 		else:
 			if i > 1:
 				get_part_from_tester_2(roger)
+				while tester_2_pass_or_fail == 12:
+					get_serial_status(comport)
 				put_in_correct_output(roger, tester_2_pass_or_fail)
+				tester_2_pass_or_fail = 12
 
 			get_part_from_welder(roger)
 			put_part_into_tester_2(roger, comport)
 
 
 	end = time.time()
-    print('the last: ' + str(num_cycles) + ' valves took: ' + str(end - start) + ' seconds for the robot to complete\n')
-    print('and ' + str(start - user_time_start) + ' for the board flip and reload\n')
-    print('total production time was: ' + str(end - user_time_start) + '\n')
-    outfile = open('partslog.txt', 'a')
-    outfile.write('50 @ time: ' + str(end) + ' total production time was: ' 
-                    + str(end - user_time_start) + ' robot took: ' + str(end - start) 
-                    + ' seconds and user took: ' + str(start - user_time_start) + '\n')
-    outfile.close()
+	print('the last: ' + str(num_cycles) + ' valves took: ' + str(end - start) + ' seconds for the robot to complete\n')
+	print('and ' + str(start - user_time_start) + ' for the board flip and reload\n')
+	print('total production time was: ' + str(end - user_time_start) + '\n')
+	outfile = open(log_file_name_and_location, 'a')
+	outfile.write('50 @ time: ' + str(end) + ' total production time was: ' 
+		+ str(end - user_time_start) + ' robot took: ' + str(end - start) 
+		+ ' seconds and user took: ' + str(start - user_time_start) + '\n')
+	outfile.close()
 
 
 time.sleep(3)
