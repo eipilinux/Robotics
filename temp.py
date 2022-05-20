@@ -336,7 +336,7 @@ log_file_name_and_location = 'Desktop/' + part_type_info + '_MO' + output_file_d
 
 while True:
 	user_time_start = time.time()
-	comport.write('Alarm On'.encode())
+	comport.write('A'.encode())
 	print('\nReady for next set')
 	num_cycles = 50#int(input('How many valves to make: '))
 	next = input('Press enter to continue')
@@ -350,7 +350,7 @@ while True:
 	outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
 	outfile.write('Production started: ' + date_info_today + ' at time: ' + start + '\n' + '\n')
 	outfile.close()
-	comport.write('Alarm Off'.encode())
+	comport.write('A'.encode())
 
 
 	for i in range(num_cycles):
