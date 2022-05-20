@@ -255,10 +255,13 @@ def put_part_into_tester_2(robot, comport):
 	move_to(robot, static_positions['second_robot_middle_testers'])
 	move_to(robot, static_positions['second_robot_home'])
 
-def put_in_correct_output(robot, pass_or_fail_value):
+def put_in_correct_output(robot, pass_or_fail_value, i_val):
 	if pass_or_fail_value == 1:
 		move_to(robot, static_positions['second_robot_good_output'])
 	else: #if pass_or_fail_value == 0:
+		outfile = open(log_file_name_and_location, 'a')
+		outfile.write('Part #' + str(i_val) + ' was bad')
+		outfile.close()
 		move_to(robot, static_positions['second_robot_bad_output'])
 	open_gripper(robot)
 	move_to(robot, static_positions['second_robot_home'])
@@ -356,10 +359,10 @@ while True:
 		put_part_into_welder_start_welder_and_get_next_part(walle, i, comport)
 		if i % 2 == 1:
 			if i > 1:
-				get_part_from_tester_1(roger)
 				while tester_1_pass_or_fail == 12:
 					get_serial_status(comport)
-				put_in_correct_output(roger, tester_1_pass_or_fail)
+				get_part_from_tester_1(roger)
+				put_in_correct_output(roger, tester_1_pass_or_fail, i)
 				tester_1_pass_or_fail = 12
 
 			get_part_from_welder(roger)
@@ -367,10 +370,10 @@ while True:
 
 		else:
 			if i > 1:
-				get_part_from_tester_2(roger)
 				while tester_2_pass_or_fail == 12:
 					get_serial_status(comport)
-				put_in_correct_output(roger, tester_2_pass_or_fail)
+				get_part_from_tester_2(roger)
+				put_in_correct_output(roger, tester_2_pass_or_fail, i)
 				tester_2_pass_or_fail = 12
 
 			get_part_from_welder(roger)
