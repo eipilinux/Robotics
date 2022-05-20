@@ -39,6 +39,10 @@ const int solo_2_start = 3;
 int SOLO_2_READY = 0; // is HIGH (1) if the system is ready for a new part and LOW (0) while testing
 int SOLO_2_STATE = 0; // holds a PASS (1) or FAIL (0) value
 
+//alarm
+bool alarm_on = false;
+const int alarm_pin = 13;
+
 void setup() {
   /*
    * We don't need crazy high baud rates because we will never be trying to time stuff to within 1/10,000th of a second 
@@ -119,6 +123,18 @@ void loop() {
       WELDER_STATE = 1;
       delay(1000);
       digitalWrite(welder_start, LOW);
+    }
+
+    //if the control computer sent 'A' (byte value of 65) then start/stop the alarm
+    if(incomingByte == 65){
+      if(alarm_on){
+        digitalWrite(alarm_pin, LOW);
+        alarm_on = false;
+      }
+      else{
+        digitalWrite(alarm_pin, HIGH);
+        alarm_on = true;
+      }
     }
 
     //if the control computer sent '1' (byte value of 49) then start tester 1
