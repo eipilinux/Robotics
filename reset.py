@@ -45,6 +45,7 @@ def connect_robot(ip, port, name_of_robot):
 
     response = robot_socket_connection.recv(1024).decode('ascii')
     print(response)
+    robot_socket_connection.send(bytes('PauseMotion'+'\0','ascii'))
 
     try:
         robot_socket_connection.send(bytes('ActivateRobot'+'\0','ascii'))
@@ -73,6 +74,9 @@ def connect_robot(ip, port, name_of_robot):
         return -1
 
     try:
+        robot_socket_connection.send(bytes('ClearMotion'+'\0','ascii'))
+        robot_socket_connection.send(bytes('ResetError'+'\0','ascii'))
+        robot_socket_connection.send(bytes('ClearMotion'+'\0','ascii'))
         robot_socket_connection.send(bytes('MoveJoints(0,0,0,0,16.5,0)'+'\0','ascii'))
         response = robot_socket_connection.recv(1024).decode('ascii')
         robot_socket_connection.send(bytes('gripperopen()'+'\0','ascii'))
@@ -123,6 +127,7 @@ roger = connect_robot("192.168.0.100", 10000, 'roger')
 move_to(walle, static_positions['home'])
 move_to(roger, static_positions['second_robot_home'])
 
+print('Reset complete')
 
 time.sleep(3)
 disconnect_robot(walle)
