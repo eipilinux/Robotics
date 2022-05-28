@@ -40,7 +40,7 @@ int SOLO_2_READY = 0; // is HIGH (1) if the system is ready for a new part and L
 int SOLO_2_STATE = 0; // holds a PASS (1) or FAIL (0) value
 
 //alarm
-bool alarm_on = false;
+int alarm_on = 0;
 const int alarm_pin = 13;
 
 void setup() {
@@ -61,6 +61,8 @@ void setup() {
   pinMode(solo_2_pass, INPUT);
 
   pinMode(welder_home, INPUT);
+  
+  pinMode(alarm_pin, OUTPUT);
 
   int SOLO_1_READY = 1; 
   int SOLO_2_READY = 1; 
@@ -126,14 +128,15 @@ void loop() {
     }
 
     //if the control computer sent 'A' (byte value of 65) then start/stop the alarm
-    if(incomingByte == 65){
-      if(alarm_on){
+    else if(incomingByte == 65){
+      Serial.println("Started Alarm");
+      if(alarm_on == 1){
         digitalWrite(alarm_pin, LOW);
-        alarm_on = false;
+        alarm_on = 0;
       }
       else{
         digitalWrite(alarm_pin, HIGH);
-        alarm_on = true;
+        alarm_on = 1;
       }
     }
 
@@ -141,7 +144,7 @@ void loop() {
     else if(incomingByte == 49){
       digitalWrite(solo_1_start, HIGH);
       Serial.println("Started Tester 1");
-      delay(20);
+      delay(40);
       digitalWrite(solo_1_start, LOW);
       //SOLO_1_READY = 0;
     }
@@ -150,7 +153,7 @@ void loop() {
     else if(incomingByte == 50){
       digitalWrite(solo_2_start, HIGH);
       Serial.println("Started Tester 2");
-      delay(20);
+      delay(40);
       digitalWrite(solo_2_start, LOW);
       //SOLO_2_READY = 0;
     }
