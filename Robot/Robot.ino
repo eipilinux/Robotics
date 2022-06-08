@@ -88,14 +88,20 @@ void setup() {
 void loop() {
   //check estop state as first priority
   if(digitalRead(input_signal_estop_pin) == HIGH && estop_state == 0){
-    Serial.println("Estop");
-    estop_state = 1;
-    delay(50);
+    delay(20);
+    if(digitalRead(input_signal_estop_pin) == HIGH){
+      Serial.println("Estop");
+      estop_state = 1;
+      delay(100);
+    }
   }
   if(digitalRead(input_signal_estop_pin) == LOW && estop_state == 1){
-    Serial.println("Estart");
-    estop_state = 0;
-    delay(50);
+    delay(20);
+    if(digitalRead(input_signal_estop_pin) == LOW && estop_state == 1){
+      Serial.println("Estart");
+      estop_state = 0;
+      delay(100);
+    }
   }
 
   //check the welder state
