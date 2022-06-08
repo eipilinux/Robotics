@@ -15,6 +15,7 @@
 * ASCII digit 1 ---> BYTE value of 49 (this is what the Raspi will send over the serial comm to start tester 1)
 * ASCII digit 2 ---> BYTE value of 50 (this is what the Raspi will send over the serial comm to start tester 2)
 * ASCII Capital 'W' ---> BYTE value of 87 (this is what the Raspi will send over the serial comm to start the welder)
+* ASCII Capital 'A' ---> BYTE value of 65 (this is what the Raspi will send over the serial comm to toggle the alarm)
 * 
 */
 
@@ -43,6 +44,10 @@ int SOLO_2_STATE = 0; // holds a PASS (1) or FAIL (0) value
 int alarm_on = 0;
 const int alarm_pin = 13;
 
+int estop_state = 0;
+const int high_estop_pin = 53;
+const int input_signal_estop_pin = 51;
+
 void setup() {
   /*
    * We don't need crazy high baud rates because we will never be trying to time stuff to within 1/10,000th of a second 
@@ -64,8 +69,15 @@ void setup() {
   
   pinMode(alarm_pin, OUTPUT);
 
+  pinMode(high_estop_pin, OUTPUT);
+  pinMode(input_signal_estop_pin, INPUT);
+
   int SOLO_1_READY = 1; 
   int SOLO_2_READY = 1; 
+
+  digitalWrite(high_estop_pin, HIGH);
+  estop_state = 0;
+  
 //  Serial.println("initializing...");
 //  delay(5000);
 //  Serial.println("System Ready");
@@ -73,9 +85,21 @@ void setup() {
 //  Serial.println(digitalRead(solo_2_pass));
 //  Serial.println(digitalRead(solo_1_end));
 //  Serial.println(digitalRead(solo_2_end));
+
 } //end of void setup{}
 
 void loop() {
+  //check estop state as first priority
+  if(digitalRead(input_signal_estop_pin) == HIGH && estop_state == 0){
+    Serial.println("Estop");
+    estop_state = 1;
+    delay(20);
+  }
+  if(digitalRead(input_signal_estop_pin) == LOW && estop_state == 1){
+    Serial.println("Estart");
+    estop_state = 0;
+    delay(20);
+  }
 
   //check the welder state
   if(digitalRead(welder_home) == HIGH && WELDER_STATE == 1){

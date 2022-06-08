@@ -45,7 +45,8 @@ def connect_robot(ip, port, name_of_robot):
 
     response = robot_socket_connection.recv(1024).decode('ascii')
     print(response)
-    robot_socket_connection.send(bytes('PauseMotion'+'\0','ascii'))
+    robot_socket_connection.send(bytes('ClearMotion'+'\0','ascii'))
+    robot_socket_connection.send(bytes('ResumeMotion'+'\0','ascii'))
 
     try:
         robot_socket_connection.send(bytes('ActivateRobot'+'\0','ascii'))

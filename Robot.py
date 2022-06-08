@@ -91,7 +91,6 @@ def connect_robot(ip, port, name_of_robot):
 
 	response = robot_socket_connection.recv(1024).decode('ascii')
 	print(response)
-	robot_socket_connection.send(bytes('PauseMotion'+'\0','ascii'))
 
 	print('Sending wake command...')
 	try:
@@ -237,6 +236,24 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 				tester_2_pass_or_fail = 1
 			elif info == "2 Fail":
 				tester_2_pass_or_fail = 0
+			elif info == "Estop":
+				try:
+					walle.send(bytes('PauseMotion'+'\0','ascii'))
+					roger.send(bytes('PauseMotion'+'\0','ascii'))
+					#response = robot.recv(1024).decode('ascii')
+					#print(response)
+					#time.sleep(.1)
+				except socket.error:
+					print('Failed to open gripper')
+			elif info == "Estart":
+				try:
+					walle.send(bytes('ResumeMotion'+'\0','ascii'))
+					roger.send(bytes('ResumeMotion'+'\0','ascii'))
+					#response = robot.recv(1024).decode('ascii')
+					#print(response)
+					#time.sleep(.1)
+				except socket.error:
+					print('Failed to open gripper')
 
 		time.sleep(0.05)
 
@@ -322,6 +339,24 @@ def get_serial_status(comport):
 			tester_2_pass_or_fail = 1
 		elif info == "2 Fail":
 			tester_2_pass_or_fail = 0
+		elif info == "Estop":
+			try:
+				walle.send(bytes('PauseMotion'+'\0','ascii'))
+				roger.send(bytes('PauseMotion'+'\0','ascii'))
+				#response = robot.recv(1024).decode('ascii')
+				#print(response)
+				#time.sleep(.1)
+			except socket.error:
+				print('Failed to open gripper')
+		elif info == "Estart":
+			try:
+				walle.send(bytes('ResumeMotion'+'\0','ascii'))
+				roger.send(bytes('ResumeMotion'+'\0','ascii'))
+				#response = robot.recv(1024).decode('ascii')
+				#print(response)
+				#time.sleep(.1)
+			except socket.error:
+				print('Failed to open gripper')
 
 		
 			
