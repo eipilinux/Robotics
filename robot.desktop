@@ -3,7 +3,7 @@ Type=Application
 Name=Robot
 GenericName=Create product
 Exec=sudo lxterminal --geometry=120x30 -e 'python3 /home/pi/robot.py'
-Icon=/usr/share/icons/Adwaita/64x64/categories/applications-science-symbolic.symbolic.png
+Icon=/usr/share/icons/Adwaita/64x64/actions/system-run-symbolic.symbolic.png
 Terminal=false
 Categories=Development;Engineering;Electronics;
 MimeType=text/robot
