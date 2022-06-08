@@ -45,7 +45,6 @@ int alarm_on = 0;
 const int alarm_pin = 13;
 
 int estop_state = 0;
-const int high_estop_pin = 53;
 const int input_signal_estop_pin = 51;
 
 void setup() {
@@ -69,13 +68,11 @@ void setup() {
   
   pinMode(alarm_pin, OUTPUT);
 
-  pinMode(high_estop_pin, OUTPUT);
   pinMode(input_signal_estop_pin, INPUT);
 
   int SOLO_1_READY = 1; 
   int SOLO_2_READY = 1; 
 
-  digitalWrite(high_estop_pin, HIGH);
   estop_state = 0;
   
 //  Serial.println("initializing...");
@@ -93,12 +90,12 @@ void loop() {
   if(digitalRead(input_signal_estop_pin) == HIGH && estop_state == 0){
     Serial.println("Estop");
     estop_state = 1;
-    delay(20);
+    delay(50);
   }
   if(digitalRead(input_signal_estop_pin) == LOW && estop_state == 1){
     Serial.println("Estart");
     estop_state = 0;
-    delay(20);
+    delay(50);
   }
 
   //check the welder state
