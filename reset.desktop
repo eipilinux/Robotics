@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Robot
+Name=Reset
 GenericName=Create product
 Exec=sudo lxterminal --geometry=120x30 -e 'python3 /home/pi/reset.py'
 Icon=/usr/share/icons/Adwaita/64x64/actions/system-reboot-symbolic.symbolic.png
