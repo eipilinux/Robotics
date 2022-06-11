@@ -154,17 +154,17 @@ void loop() {
       digitalWrite(welder_start, LOW);
     }
 
-    //if the control computer sent 'A' (byte value of 65) then start/stop the alarm
+    //if the control computer sent 'A' (byte value of 65) then start the alarm
     else if(incomingByte == 65){
       Serial.println("Started Alarm");
-      if(alarm_on == 1){
-        digitalWrite(alarm_pin, LOW);
-        alarm_on = 0;
-      }
-      else{
-        digitalWrite(alarm_pin, HIGH);
-        alarm_on = 1;
-      }
+      digitalWrite(alarm_pin, HIGH);
+      alarm_on = 1;
+    }
+    //if the control computer sent 'B' (byte value of 66) then stop the alarm
+    else if(incomingByte == 66){
+      Serial.println("Stopped Alarm");
+      digitalWrite(alarm_pin, LOW);
+      alarm_on = 0;
     }
 
     //if the control computer sent '1' (byte value of 49) then start tester 1

@@ -29,6 +29,7 @@ default_speed = 'SetJointVel(' + str(100) + ')'
 
 
 def connect_robot(ip, port, name_of_robot):
+	print('Attempting to connect to robot: ' + name_of_robot + ' at address: ' + ip + ' over port: ' + str(port) + '\n...')
     try:
         robot_socket_connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error:
@@ -51,7 +52,9 @@ def connect_robot(ip, port, name_of_robot):
     try:
         robot_socket_connection.send(bytes('ActivateRobot'+'\0','ascii'))
         if delay_set == True:
-            time.sleep(15)
+			for i in range(15):
+				time.sleep(1)
+				print('...')
         response = robot_socket_connection.recv(1024).decode('ascii')
         print(response) 
     except socket.error:
@@ -121,7 +124,23 @@ def disconnect_robot(robot):
         #robot.close() 
     except socket.error:
         print('Failed to disconnect')     
-            
+
+
+def connect_control(serial_port, baud_rate):
+	ser = serial.Serial(serial_port, baud_rate, timeout=1)
+	for i in range(15):
+		time.sleep(1)
+		print('...')
+
+	ser.reset_input_buffer()
+	print('connected to control unit\n')
+	return ser
+
+
+control_port = '/dev/ttyACM0'
+comport = connect_control(control_port, 9600)
+comport.write('B'.encode())
+
 walle = connect_robot("192.168.0.101", 10000, 'walle')
 roger = connect_robot("192.168.0.100", 10000, 'roger')
 

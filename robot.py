@@ -319,7 +319,9 @@ def get_part_from_welder(robot):
 
 def connect_control(serial_port, baud_rate):
 	ser = serial.Serial(serial_port, baud_rate, timeout=1)
-	time.sleep(15)
+	for i in range(15):
+		time.sleep(1)
+		print('...')
 	ser.reset_input_buffer()
 	print('connected to control unit\n')
 	return ser
@@ -373,25 +375,34 @@ move_to(roger, static_positions['second_robot_home'])
 
 log_file_name_and_location = 'Desktop/' + part_type_info + '_MO' + output_file_descriptor1 + '_LOT' + output_file_descriptor2 + '_DATE' + str(date_info_today) + '_partslog.txt'
 
+first_run_start_up = 1
 
 while True:
 	user_time_start = time.time()
-	comport.write('A'.encode())
-	print('\nReady for next set')
-	num_cycles = 50#int(input('How many valves to make: '))
-	next = input('Press enter to continue')
-
-
-	start = time.time()
-	comport.reset_input_buffer()
-
-
-	outfile = open(log_file_name_and_location, 'a')
-	outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
-	outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + start + '\n' + '\n')
-	outfile.close()
-	comport.write('A'.encode())
-
+	if first_run_start_up == 1:
+		first_run_start_up = 0
+		print('\nReady for next set')
+		num_cycles = 50#int(input('How many valves to make: '))
+		next = input('Press enter to continue')
+		start = time.time()
+		comport.reset_input_buffer()
+		outfile = open(log_file_name_and_location, 'a')
+		outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
+		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + start + '\n' + '\n')
+		outfile.close()
+	else:
+		comport.write('A'.encode())
+		print('\nReady for next set')
+		num_cycles = 50#int(input('How many valves to make: '))
+		next = input('Press enter to continue')
+		start = time.time()
+		comport.reset_input_buffer()
+		
+		outfile = open(log_file_name_and_location, 'a')
+		outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
+		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + start + '\n' + '\n')
+		outfile.close()
+		comport.write('B'.encode())
 
 	for i in range(num_cycles):
 		print("getting part #: " + str(i) + '\n')
