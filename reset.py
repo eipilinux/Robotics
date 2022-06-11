@@ -29,7 +29,7 @@ default_speed = 'SetJointVel(' + str(100) + ')'
 
 
 def connect_robot(ip, port, name_of_robot):
-	print('Attempting to connect to robot: ' + name_of_robot + ' at address: ' + ip + ' over port: ' + str(port) + '\n...')
+    print('Attempting to connect to robot: ' + name_of_robot + ' at address: ' + ip + ' over port: ' + str(port) + '\n...')
     try:
         robot_socket_connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error:
@@ -81,6 +81,7 @@ def connect_robot(ip, port, name_of_robot):
         robot_socket_connection.send(bytes('ClearMotion'+'\0','ascii'))
         robot_socket_connection.send(bytes('ResetError'+'\0','ascii'))
         robot_socket_connection.send(bytes('ClearMotion'+'\0','ascii'))
+        robot_socket_connection.send(bytes('ResumeMotion'+'\0','ascii'))
         robot_socket_connection.send(bytes('MoveJoints(0,0,0,0,16.5,0)'+'\0','ascii'))
         response = robot_socket_connection.recv(1024).decode('ascii')
         robot_socket_connection.send(bytes('gripperopen()'+'\0','ascii'))
@@ -147,11 +148,11 @@ roger = connect_robot("192.168.0.100", 10000, 'roger')
 move_to(walle, static_positions['home'])
 move_to(roger, static_positions['second_robot_home'])
 
-print('Reset complete')
-
 time.sleep(3)
 disconnect_robot(walle)
 disconnect_robot(roger)
+print('Reset complete, shutting down')
+a = input('Press enter to close')
 sys.exit()
     
 

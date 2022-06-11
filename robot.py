@@ -40,9 +40,9 @@ static_positions = {
 print("Today's date:", date.today())
 set_default_speed = 100
 #set_slow_speed = int(input('Slow speed: '))
-part_type_info = input('Enter the product name: ')
-output_file_descriptor1 = input('Enter the MO #: ')
-output_file_descriptor2 = input('Enter the Lot #: ')
+part_type_info = str(input('Enter the product name: '))
+output_file_descriptor1 = str(input('Enter the MO #: '))
+output_file_descriptor2 = str(input('Enter the Lot #: '))
 date_info_today = date.today()
 
 default_speed = 'SetJointVel(' + str(set_default_speed) + ')'
@@ -126,6 +126,7 @@ def connect_robot(ip, port, name_of_robot):
 	try:
 		robot_socket_connection.send(bytes('ResetError'+'\0','ascii'))
 		robot_socket_connection.send(bytes('ClearMotion'+'\0','ascii'))
+		robot_socket_connection.send(bytes('ResumeMotion'+'\0','ascii'))
 		#robot_socket_connection.send(bytes('PauseMotion'+'\0','ascii'))
 		robot_socket_connection.send(bytes('MoveJoints(0,0,0,0,16.5,0)'+'\0','ascii'))
 		response = robot_socket_connection.recv(1024).decode('ascii')
@@ -347,7 +348,7 @@ def get_serial_status(comport):
 	global tester_2_pass_or_fail
 	global estop_pressed
 	while comport.in_waiting or estop_pressed == 1:
-		if !comport.in_waiting:
+		if not comport.in_waiting:
 			continue
 		line = comport.readline()
 		info = line.strip().decode('utf-8')
@@ -397,8 +398,8 @@ comport = connect_control(control_port, 9600)
 walle = connect_robot("192.168.0.101", 10000, 'walle')
 roger = connect_robot("192.168.0.100", 10000, 'roger')
 
-move_to(walle, static_positions['home'])
-move_to(roger, static_positions['second_robot_home'])
+move_to(walle, static_positions['home'], comport)
+move_to(roger, static_positions['second_robot_home'], comport)
 
 log_file_name_and_location = 'Desktop/' + part_type_info + '_MO' + output_file_descriptor1 + '_LOT' + output_file_descriptor2 + '_DATE' + str(date_info_today) + '_partslog.txt'
 
@@ -414,7 +415,7 @@ while True:
 		start = time.time()
 		comport.reset_input_buffer()
 		outfile = open(log_file_name_and_location, 'a')
-		outfile.write('Product Name: ' + part_type_info + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
+		outfile.write('Product Name: ' + part_type_info + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + output_file_descriptor2 + '\n')
 		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + start + '\n' + '\n')
 		outfile.close()
 	else:
@@ -426,7 +427,7 @@ while True:
 		comport.reset_input_buffer()
 		
 		outfile = open(log_file_name_and_location, 'a')
-		outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
+		outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + output_file_descriptor2 + '\n')
 		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + start + '\n' + '\n')
 		outfile.close()
 		comport.write('B'.encode())
