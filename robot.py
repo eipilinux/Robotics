@@ -98,7 +98,7 @@ def connect_robot(ip, port, name_of_robot):
 	try:
 		robot_socket_connection.send(bytes('ActivateRobot'+'\0','ascii'))
 		if delay_set == True:
-			for i in range(15):
+			for i in range(5):
 				time.sleep(1)
 				print('...')
 		response = robot_socket_connection.recv(1024).decode('ascii')
@@ -336,7 +336,7 @@ def get_part_from_welder(robot):
 
 def connect_control(serial_port, baud_rate):
 	ser = serial.Serial(serial_port, baud_rate, timeout=1)
-	for i in range(15):
+	for i in range(10):
 		time.sleep(1)
 		print('...')
 	ser.reset_input_buffer()
@@ -349,6 +349,7 @@ def get_serial_status(comport):
 	global estop_pressed
 	while comport.in_waiting or estop_pressed == 1:
 		if not comport.in_waiting:
+			time.sleep(.2)
 			continue
 		line = comport.readline()
 		info = line.strip().decode('utf-8')
@@ -409,8 +410,11 @@ while True:
 	user_time_start = time.time()
 	if first_run_start_up == 1:
 		first_run_start_up = 0
+		comport.write('A'.encode())
 		print('\nReady for next set')
 		num_cycles = 50#int(input('How many valves to make: '))
+		time.sleep(1)
+		comport.write('B'.encode())
 		next = input('Press enter to continue')
 		start = time.time()
 		comport.reset_input_buffer()

@@ -129,7 +129,7 @@ def disconnect_robot(robot):
 
 def connect_control(serial_port, baud_rate):
     ser = serial.Serial(serial_port, baud_rate, timeout=1)
-    for i in range(15):
+    for i in range(0):
         time.sleep(1)
         print('...')
 
