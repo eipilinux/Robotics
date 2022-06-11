@@ -16,6 +16,8 @@ tester_2_pass_or_fail = 12
 
 delay_set = True
 
+estop_pressed = 0
+
 static_positions = {
 	'home': 'MoveJoints(-2.266,6.800,56.742,0.000,-65.000,-0.000)',
 	'ready_for_welder': 'MovePose(-14.113,-174.370,242.565,88.859,-1.310,-90.121)',
@@ -137,7 +139,8 @@ def connect_robot(ip, port, name_of_robot):
 	print('\n')
 	return robot_socket_connection
 
-def move_to(robot, position):
+def move_to(robot, position, comport):
+	get_serial_status(comport)
 	#check estop
 	  #   while comport.in_waiting:
 			# line = comport.readline()
@@ -194,40 +197,45 @@ def disconnect_robot(robot):
 def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 	global tester_1_pass_or_fail
 	global tester_2_pass_or_fail
+	global estop_pressed
 	if i == 0:
 		open_gripper(robot)
-		move_to(robot, generate_nth_position(i, 100))
+		move_to(robot, generate_nth_position(i, 100), comport)
 		#time.sleep(0.1)
-		move_to(robot, generate_nth_position(i, 0))
+		move_to(robot, generate_nth_position(i, 0), comport)
 		close_gripper(robot)
-		move_to(robot, generate_nth_position(i, 100))
-		move_to(robot, static_positions['home'])
+		move_to(robot, generate_nth_position(i, 100), comport)
+		move_to(robot, static_positions['home'], comport)
 
-	move_to(robot, static_positions['ready_for_welder'])
-	move_to(robot, static_positions['over_welder'])
-	move_to(robot, static_positions['on_welder'])
+	move_to(robot, static_positions['ready_for_welder'], comport)
+	move_to(robot, static_positions['over_welder'], comport)
+	move_to(robot, static_positions['on_welder'], comport)
 	open_gripper(robot)
-	move_to(robot, static_positions['over_welder'])
-	move_to(robot, static_positions['ready_for_welder'])
+	move_to(robot, static_positions['over_welder'], comport)
+	move_to(robot, static_positions['ready_for_welder'], comport)
 
 	comport.write('W'.encode())
 
-	move_to(robot, static_positions['home'])
+	move_to(robot, static_positions['home'], comport)
 
 	if i < 49:
-		move_to(robot, generate_nth_position(i+1, 100))
+		move_to(robot, generate_nth_position(i+1, 100), comport)
 		#time.sleep(0.1)
-		move_to(robot, generate_nth_position(i+1, 0))
+		move_to(robot, generate_nth_position(i+1, 0), comport)
 		close_gripper(robot)
-		move_to(robot, generate_nth_position(i+1, 100))
-		move_to(robot, static_positions['home'])
+		move_to(robot, generate_nth_position(i+1, 100), comport)
+		move_to(robot, static_positions['home'], comport)
 
 	while True:
 		if comport.in_waiting:
 			line = comport.readline()
 			info = line.strip().decode('utf-8')
 			if info == "Welder Home":
-				break
+				if estop_pressed == 0:
+					break
+				else:
+					get_serial_status(comport)
+					break
 			elif info == "1 Pass":
 				tester_1_pass_or_fail = 1
 			elif info == "1 Fail":
@@ -238,8 +246,12 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 				tester_2_pass_or_fail = 0
 			elif info == "Estop":
 				try:
+					estop_pressed = 1
 					walle.send(bytes('PauseMotion'+'\0','ascii'))
 					roger.send(bytes('PauseMotion'+'\0','ascii'))
+					outfile = open(log_file_name_and_location, 'a')
+					outfile.write('E-Stop pressed at: ' + str(time.time()) + '\n')
+					outfile.close()
 					#response = robot.recv(1024).decode('ascii')
 					#print(response)
 					#time.sleep(.1)
@@ -247,8 +259,12 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 					print('Failed to open gripper')
 			elif info == "Estart":
 				try:
+					estop_pressed = 0
 					walle.send(bytes('ResumeMotion'+'\0','ascii'))
 					roger.send(bytes('ResumeMotion'+'\0','ascii'))
+					outfile = open(log_file_name_and_location, 'a')
+					outfile.write('E-Stop reset at: ' + str(time.time()) + '\n')
+					outfile.close()
 					#response = robot.recv(1024).decode('ascii')
 					#print(response)
 					#time.sleep(.1)
@@ -258,64 +274,64 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 		time.sleep(0.05)
 
 def put_part_into_tester_1(robot, comport):
-	move_to(robot, static_positions['second_robot_middle_testers'])
-	move_to(robot, static_positions['second_robot_over_tester1'])
-	move_to(robot, static_positions['second_robot_on_tester1'])
+	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_over_tester1'], comport)
+	move_to(robot, static_positions['second_robot_on_tester1'], comport)
 	open_gripper(robot)
-	move_to(robot, static_positions['second_robot_over_tester1'])
+	move_to(robot, static_positions['second_robot_over_tester1'], comport)
 	comport.write('2'.encode())
-	move_to(robot, static_positions['second_robot_middle_testers'])
-	move_to(robot, static_positions['second_robot_home'])
+	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_home'], comport)
 
 def put_part_into_tester_2(robot, comport):
-	move_to(robot, static_positions['second_robot_middle_testers'])
-	move_to(robot, static_positions['second_robot_over_tester2'])
-	move_to(robot, static_positions['second_robot_on_tester2'])
+	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_over_tester2'], comport)
+	move_to(robot, static_positions['second_robot_on_tester2'], comport)
 	open_gripper(robot)
-	move_to(robot, static_positions['second_robot_over_tester2'])
+	move_to(robot, static_positions['second_robot_over_tester2'], comport)
 	comport.write('1'.encode())
-	move_to(robot, static_positions['second_robot_middle_testers'])
-	move_to(robot, static_positions['second_robot_home'])
+	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_home'], comport)
 
 def put_in_correct_output(robot, pass_or_fail_value, i_val):
 	if pass_or_fail_value == 1:
-		move_to(robot, static_positions['second_robot_good_output'])
+		move_to(robot, static_positions['second_robot_good_output'], comport)
 	else: #if pass_or_fail_value == 0:
 		outfile = open(log_file_name_and_location, 'a')
 		outfile.write('Part #' + str(i_val) + ' was bad')
 		outfile.close()
-		move_to(robot, static_positions['second_robot_bad_output'])
+		move_to(robot, static_positions['second_robot_bad_output'], comport)
 	open_gripper(robot)
-	move_to(robot, static_positions['second_robot_home'])
+	move_to(robot, static_positions['second_robot_home'], comport)
 
 def get_part_from_tester_1(robot):
 	open_gripper(robot)
-	move_to(robot, static_positions['second_robot_middle_testers'])
-	move_to(robot, static_positions['second_robot_over_tester1'])
-	move_to(robot, static_positions['second_robot_on_tester1'])
+	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_over_tester1'], comport)
+	move_to(robot, static_positions['second_robot_on_tester1'], comport)
 	close_gripper(robot)
-	move_to(robot, static_positions['second_robot_over_tester1'])
-	move_to(robot, static_positions['second_robot_middle_testers'])
-	move_to(robot, static_positions['second_robot_home'])
+	move_to(robot, static_positions['second_robot_over_tester1'], comport)
+	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_home'], comport)
 
 def get_part_from_tester_2(robot):
 	open_gripper(robot)
-	move_to(robot, static_positions['second_robot_middle_testers'])
-	move_to(robot, static_positions['second_robot_over_tester2'])
-	move_to(robot, static_positions['second_robot_on_tester2'])
+	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_over_tester2'], comport)
+	move_to(robot, static_positions['second_robot_on_tester2'], comport)
 	close_gripper(robot)
-	move_to(robot, static_positions['second_robot_over_tester2'])
-	move_to(robot, static_positions['second_robot_middle_testers'])
-	move_to(robot, static_positions['second_robot_home'])
+	move_to(robot, static_positions['second_robot_over_tester2'], comport)
+	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_home'], comport)
 
 def get_part_from_welder(robot):
-	move_to(robot, static_positions['second_robot_ready_for_welder'])
-	move_to(robot, static_positions['second_robot_over_welder'])
-	move_to(robot, static_positions['second_robot_on_welder'])
+	move_to(robot, static_positions['second_robot_ready_for_welder'], comport)
+	move_to(robot, static_positions['second_robot_over_welder'], comport)
+	move_to(robot, static_positions['second_robot_on_welder'], comport)
 	close_gripper(robot)
-	move_to(robot, static_positions['second_robot_over_welder'])
-	move_to(robot, static_positions['second_robot_ready_for_welder'])
-	move_to(robot, static_positions['second_robot_home'])
+	move_to(robot, static_positions['second_robot_over_welder'], comport)
+	move_to(robot, static_positions['second_robot_ready_for_welder'], comport)
+	move_to(robot, static_positions['second_robot_home'], comport)
 
 def connect_control(serial_port, baud_rate):
 	ser = serial.Serial(serial_port, baud_rate, timeout=1)
@@ -329,7 +345,10 @@ def connect_control(serial_port, baud_rate):
 def get_serial_status(comport):
 	global tester_1_pass_or_fail
 	global tester_2_pass_or_fail
-	while comport.in_waiting:
+	global estop_pressed
+	while comport.in_waiting or estop_pressed == 1:
+		if !comport.in_waiting:
+			continue
 		line = comport.readline()
 		info = line.strip().decode('utf-8')
 		print(info)
@@ -343,8 +362,12 @@ def get_serial_status(comport):
 			tester_2_pass_or_fail = 0
 		elif info == "Estop":
 			try:
+				estop_pressed = 1
 				walle.send(bytes('PauseMotion'+'\0','ascii'))
 				roger.send(bytes('PauseMotion'+'\0','ascii'))
+				outfile = open(log_file_name_and_location, 'a')
+				outfile.write('E-Stop pressed at: ' + str(time.time()) + '\n')
+				outfile.close()
 				#response = robot.recv(1024).decode('ascii')
 				#print(response)
 				#time.sleep(.1)
@@ -352,8 +375,12 @@ def get_serial_status(comport):
 				print('Failed to open gripper')
 		elif info == "Estart":
 			try:
+				estop_pressed = 0
 				walle.send(bytes('ResumeMotion'+'\0','ascii'))
 				roger.send(bytes('ResumeMotion'+'\0','ascii'))
+				outfile = open(log_file_name_and_location, 'a')
+				outfile.write('E-Stop reset at: ' + str(time.time()) + '\n')
+				outfile.close()
 				#response = robot.recv(1024).decode('ascii')
 				#print(response)
 				#time.sleep(.1)
@@ -387,7 +414,7 @@ while True:
 		start = time.time()
 		comport.reset_input_buffer()
 		outfile = open(log_file_name_and_location, 'a')
-		outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
+		outfile.write('Product Name: ' + part_type_info + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + start + '\n')
 		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + start + '\n' + '\n')
 		outfile.close()
 	else:
