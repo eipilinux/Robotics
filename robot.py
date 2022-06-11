@@ -416,7 +416,7 @@ while True:
 		comport.reset_input_buffer()
 		outfile = open(log_file_name_and_location, 'a')
 		outfile.write('Product Name: ' + part_type_info + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + output_file_descriptor2 + '\n')
-		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + start + '\n' + '\n')
+		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + str(start) + '\n' + '\n')
 		outfile.close()
 	else:
 		comport.write('A'.encode())
@@ -428,7 +428,7 @@ while True:
 		
 		outfile = open(log_file_name_and_location, 'a')
 		outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + output_file_descriptor2 + '\n')
-		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + start + '\n' + '\n')
+		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + str(start) + '\n' + '\n')
 		outfile.close()
 		comport.write('B'.encode())
 

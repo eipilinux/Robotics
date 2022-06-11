@@ -52,9 +52,9 @@ def connect_robot(ip, port, name_of_robot):
     try:
         robot_socket_connection.send(bytes('ActivateRobot'+'\0','ascii'))
         if delay_set == True:
-			for i in range(15):
-				time.sleep(1)
-				print('...')
+            for i in range(15):
+                time.sleep(1)
+                print('...')
         response = robot_socket_connection.recv(1024).decode('ascii')
         print(response) 
     except socket.error:
