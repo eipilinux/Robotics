@@ -337,6 +337,7 @@ def get_part_from_welder(robot):
 
 def connect_control(serial_port, baud_rate):
 	ser = serial.Serial(serial_port, baud_rate, timeout=1)
+	print('connecting to control unit...')
 	for i in range(10):
 		time.sleep(1)
 		print('...')
@@ -431,7 +432,7 @@ while True:
 		start = time.time()
 		comport.reset_input_buffer()
 		outfile = open(log_file_name_and_location, 'a')
-		outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + output_file_descriptor2 + '\n')
+		outfile.write('Product Name: ' + part_type_info + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + output_file_descriptor2 + '\n')
 		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + str(time.ctime()) + '\n' + '\n')
 		outfile.close()
 		comport.write('B'.encode())
@@ -468,7 +469,7 @@ while True:
 	print('and ' + str(start - user_time_start) + ' for the board flip and reload\n')
 	print('total production time was: ' + str(end - user_time_start) + '\n')
 	outfile = open(log_file_name_and_location, 'a')
-	outfile.write('50 @ time: ' + str(end) + ' total production time was: ' 
+	outfile.write('50 finished at: ' + str(time.ctime()) + ' total production time was: ' 
 		+ str(end - user_time_start) + ' robot took: ' + str(end - start) 
 		+ ' seconds and user took: ' + str(start - user_time_start) + '\n')
 	outfile.close()
