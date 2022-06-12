@@ -232,11 +232,12 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 			line = comport.readline()
 			info = line.strip().decode('utf-8')
 			if info == "Welder Home":
-				if estop_pressed == 0:
-					break
-				else:
-					get_serial_status(comport)
-					break
+				break
+				# if estop_pressed == 0:
+				# 	break
+				# else:
+				# 	get_serial_status(comport)
+				# 	break
 			elif info == "1 Pass":
 				tester_1_pass_or_fail = 1
 			elif info == "1 Fail":
@@ -368,7 +369,7 @@ def get_serial_status(comport):
 				walle.send(bytes('PauseMotion'+'\0','ascii'))
 				roger.send(bytes('PauseMotion'+'\0','ascii'))
 				outfile = open(log_file_name_and_location, 'a')
-				outfile.write('E-Stop pressed at: ' + str(time.time()) + '\n')
+				outfile.write('E-Stop pressed at: ' + str(time.ctime()) + '\n')
 				outfile.close()
 				#response = robot.recv(1024).decode('ascii')
 				#print(response)
@@ -381,7 +382,7 @@ def get_serial_status(comport):
 				walle.send(bytes('ResumeMotion'+'\0','ascii'))
 				roger.send(bytes('ResumeMotion'+'\0','ascii'))
 				outfile = open(log_file_name_and_location, 'a')
-				outfile.write('E-Stop reset at: ' + str(time.time()) + '\n')
+				outfile.write('E-Stop reset at: ' + str(time.ctime()) + '\n')
 				outfile.close()
 				#response = robot.recv(1024).decode('ascii')
 				#print(response)
@@ -420,7 +421,7 @@ while True:
 		comport.reset_input_buffer()
 		outfile = open(log_file_name_and_location, 'a')
 		outfile.write('Product Name: ' + part_type_info + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + output_file_descriptor2 + '\n')
-		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + str(start) + '\n' + '\n')
+		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + str(time.ctime()) + '\n' + '\n')
 		outfile.close()
 	else:
 		comport.write('A'.encode())
@@ -429,10 +430,9 @@ while True:
 		next = input('Press enter to continue')
 		start = time.time()
 		comport.reset_input_buffer()
-		
 		outfile = open(log_file_name_and_location, 'a')
 		outfile.write('Product Name: ' + part_type + ' Manufacturing Order Number: ' + output_file_descriptor1 + ' Lot Number: ' + output_file_descriptor2 + '\n')
-		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + str(start) + '\n' + '\n')
+		outfile.write('Production started: ' + str(date_info_today) + ' at time: ' + str(time.ctime()) + '\n' + '\n')
 		outfile.close()
 		comport.write('B'.encode())
 
