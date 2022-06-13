@@ -248,32 +248,35 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 				tester_2_pass_or_fail = 1
 			elif info == "2 Fail":
 				tester_2_pass_or_fail = 0
-			elif info == "Estop":
-				try:
-					estop_pressed = 1
-					walle.send(bytes('PauseMotion'+'\0','ascii'))
-					roger.send(bytes('PauseMotion'+'\0','ascii'))
-					outfile = open(log_file_name_and_location, 'a')
-					outfile.write('E-Stop pressed at: ' + str(time.time()) + '\n')
-					outfile.close()
-					#response = robot.recv(1024).decode('ascii')
-					#print(response)
-					#time.sleep(.1)
-				except socket.error:
-					print('Failed to open gripper')
-			elif info == "Estart":
-				try:
-					estop_pressed = 0
-					walle.send(bytes('ResumeMotion'+'\0','ascii'))
-					roger.send(bytes('ResumeMotion'+'\0','ascii'))
-					outfile = open(log_file_name_and_location, 'a')
-					outfile.write('E-Stop reset at: ' + str(time.time()) + '\n')
-					outfile.close()
-					#response = robot.recv(1024).decode('ascii')
-					#print(response)
-					#time.sleep(.1)
-				except socket.error:
-					print('Failed to open gripper')
+				
+			#I think since this is all captured in each move robot command we are fine to exclude it here
+
+			# elif info == "Estop":
+			# 	try:
+			# 		estop_pressed = 1
+			# 		walle.send(bytes('PauseMotion'+'\0','ascii'))
+			# 		roger.send(bytes('PauseMotion'+'\0','ascii'))
+			# 		outfile = open(log_file_name_and_location, 'a')
+			# 		outfile.write('E-Stop pressed at: ' + str(time.ctime()) + '\n')
+			# 		outfile.close()
+			# 		#response = robot.recv(1024).decode('ascii')
+			# 		#print(response)
+			# 		#time.sleep(.1)
+			# 	except socket.error:
+			# 		print('Failed to open gripper')
+			# elif info == "Estart":
+			# 	try:
+			# 		estop_pressed = 0
+			# 		walle.send(bytes('ResumeMotion'+'\0','ascii'))
+			# 		roger.send(bytes('ResumeMotion'+'\0','ascii'))
+			# 		outfile = open(log_file_name_and_location, 'a')
+			# 		outfile.write('E-Stop reset at: ' + str(time.ctime()) + '\n')
+			# 		outfile.close()
+			# 		#response = robot.recv(1024).decode('ascii')
+			# 		#print(response)
+			# 		#time.sleep(.1)
+			# 	except socket.error:
+			# 		print('Failed to open gripper')
 
 		time.sleep(0.05)
 
