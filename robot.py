@@ -56,7 +56,7 @@ def generate_nth_position(i, z_increase):
 	dist_between_parts = 27.719
 	start_pos_x = 125.703 + x_adj
 	start_pos_y = 176.158 + y_adj
-	start_pos_z = 98 + z_adj   #last value: 95.115 70.729 this used to be 105.115 before
+	start_pos_z = 100 + z_adj   #last value: 95.115 70.729 this used to be 105.115 before
 	orientation_data = '-89.553,-0.079,89.288)'
 	header_string = 'MovePose('
 	x_offset = (i % 10) * dist_between_parts * -1.0
