@@ -225,7 +225,9 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 		move_to(robot, generate_nth_position(i+1, 0), comport)
 		close_gripper(robot)
 		move_to(robot, generate_nth_position(i+1, 100), comport)
-		move_to(robot, static_positions['home'], comport)
+		#hopefully we dont need this and it makes it faster
+		#move_to(robot, static_positions['home'], comport)
+		move_to(robot, static_positions['ready_for_welder'], comport)
 
 	while True:
 		if comport.in_waiting:
@@ -475,6 +477,9 @@ while True:
 		+ str(end - user_time_start) + ' robot took: ' + str(end - start) 
 		+ ' seconds and user took: ' + str(start - user_time_start) + '\n')
 	outfile.close()
+
+	move_to(walle, static_positions['home'], comport)
+	move_to(roger, static_positions['second_robot_home'], comport)
 
 
 time.sleep(3)
