@@ -55,7 +55,7 @@ def generate_nth_position(i, z_increase):
 
 	dist_between_parts = 27.719
 	start_pos_x = 125.703 + x_adj
-	start_pos_y = 176.158 + y_adj
+	start_pos_y = 174.650 + y_adj	#used to be 176.158
 	start_pos_z = 100 + z_adj   #last value: 95.115 70.729 this used to be 105.115 before
 	orientation_data = '-89.553,-0.079,89.288)'
 	header_string = 'MovePose('
@@ -241,13 +241,13 @@ def put_part_into_welder_start_welder_and_get_next_part(robot, i, comport):
 				# 	get_serial_status(comport)
 				# 	break
 			elif info == "1 Pass":
-				tester_1_pass_or_fail = 1
-			elif info == "1 Fail":
-				tester_1_pass_or_fail = 0
-			elif info == "2 Pass":
 				tester_2_pass_or_fail = 1
-			elif info == "2 Fail":
+			elif info == "1 Fail":
 				tester_2_pass_or_fail = 0
+			elif info == "2 Pass":
+				tester_1_pass_or_fail = 1
+			elif info == "2 Fail":
+				tester_1_pass_or_fail = 0
 
 			#I think since this is all captured in each move robot command we are fine to exclude it here #lol nope! that didnt work
 
@@ -287,7 +287,9 @@ def put_part_into_tester_1(robot, comport):
 	open_gripper(robot)
 	move_to(robot, static_positions['second_robot_over_tester1'], comport)
 	comport.write('2'.encode())
-	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_over_tester2'], comport)
+
+	#move_to(robot, static_positions['second_robot_middle_testers'], comport)
 	#we might save time by not doing this extra home move
 	#move_to(robot, static_positions['second_robot_home'], comport)
 
@@ -298,7 +300,9 @@ def put_part_into_tester_2(robot, comport):
 	open_gripper(robot)
 	move_to(robot, static_positions['second_robot_over_tester2'], comport)
 	comport.write('1'.encode())
-	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	move_to(robot, static_positions['second_robot_over_tester1'], comport)
+
+	#move_to(robot, static_positions['second_robot_middle_testers'], comport)
 	#we might save time by not doing this extra home move
 	#move_to(robot, static_positions['second_robot_home'], comport)
 
@@ -311,7 +315,8 @@ def put_in_correct_output(robot, pass_or_fail_value, i_val):
 		outfile.close()
 		move_to(robot, static_positions['second_robot_bad_output'], comport)
 	open_gripper(robot)
-	move_to(robot, static_positions['second_robot_home'], comport)
+	#maybe try it without this home command?
+	#move_to(robot, static_positions['second_robot_home'], comport)
 
 def get_part_from_tester_1(robot):
 	open_gripper(robot)
@@ -364,13 +369,13 @@ def get_serial_status(comport):
 		info = line.strip().decode('utf-8')
 		print(info)
 		if info == "1 Pass":
-			tester_1_pass_or_fail = 1
-		elif info == "1 Fail":
-			tester_1_pass_or_fail = 0
-		elif info == "2 Pass":
 			tester_2_pass_or_fail = 1
-		elif info == "2 Fail":
+		elif info == "1 Fail":
 			tester_2_pass_or_fail = 0
+		elif info == "2 Pass":
+			tester_1_pass_or_fail = 1
+		elif info == "2 Fail":
+			tester_1_pass_or_fail = 0
 		elif info == "Estop":
 			try:
 				estop_pressed = 1
