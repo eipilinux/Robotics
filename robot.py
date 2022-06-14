@@ -37,6 +37,14 @@ static_positions = {
 	'second_robot_bad_output': 'MovePose(-8.575,-311.313,155.931,89.046,0.000,-90.000)'
 }
 
+left_time_before_expire = (1657780000.0 - time.time())/86400.0
+if 1657780000.0 > time.time():
+    print('good to use for the remaining: ' + str(left_time) + ' days of temporary license')
+else:
+    print('Temporary software license has expired.')
+    stop_everything_on_enter = input('press enter to exit')
+    sys.exit()
+
 print("Today's date:", date.today())
 set_default_speed = 100
 #set_slow_speed = int(input('Slow speed: '))
@@ -311,7 +319,7 @@ def put_in_correct_output(robot, pass_or_fail_value, i_val):
 		move_to(robot, static_positions['second_robot_good_output'], comport)
 	else: #if pass_or_fail_value == 0:
 		outfile = open(log_file_name_and_location, 'a')
-		outfile.write('Part #' + str(i_val) + ' was bad')
+		outfile.write('Part #' + str(i_val) + ' was bad\n')
 		outfile.close()
 		move_to(robot, static_positions['second_robot_bad_output'], comport)
 	open_gripper(robot)
