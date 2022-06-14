@@ -328,7 +328,7 @@ def put_in_correct_output(robot, pass_or_fail_value, i_val):
 
 def get_part_from_tester_1(robot):
 	open_gripper(robot)
-	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	#move_to(robot, static_positions['second_robot_middle_testers'], comport)
 	move_to(robot, static_positions['second_robot_over_tester1'], comport)
 	move_to(robot, static_positions['second_robot_on_tester1'], comport)
 	close_gripper(robot)
@@ -338,7 +338,7 @@ def get_part_from_tester_1(robot):
 
 def get_part_from_tester_2(robot):
 	open_gripper(robot)
-	move_to(robot, static_positions['second_robot_middle_testers'], comport)
+	#move_to(robot, static_positions['second_robot_middle_testers'], comport)
 	move_to(robot, static_positions['second_robot_over_tester2'], comport)
 	move_to(robot, static_positions['second_robot_on_tester2'], comport)
 	close_gripper(robot)
