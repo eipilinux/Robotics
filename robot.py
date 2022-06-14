@@ -48,6 +48,9 @@ else:
 print("Today's date:", date.today())
 set_default_speed = 100
 #set_slow_speed = int(input('Slow speed: '))
+#should_we_do_a_flip = input('Is this part going to be flipped for testing? (y + ENTER for yes, n + ENTER for no)')
+#if should_we_do_a_flip == 'y':
+	#need to add code here that changes the static positions 6th axis rotation by 180 degrees
 part_type_info = str(input('Enter the product name: '))
 output_file_descriptor1 = str(input('Enter the MO #: '))
 output_file_descriptor2 = str(input('Enter the Lot #: '))
