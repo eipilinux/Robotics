@@ -63,7 +63,7 @@ def generate_nth_position(i, z_increase):
 
 	dist_between_parts = 27.719
 	start_pos_x = 125.703 + x_adj
-	start_pos_y = 174.650 + y_adj	#used to be 176.158
+	start_pos_y = 173.650 + y_adj	#used to be 176.158
 	start_pos_z = 100 + z_adj   #last value: 95.115 70.729 this used to be 105.115 before
 	orientation_data = '-89.553,-0.079,89.288)'
 	header_string = 'MovePose('
@@ -319,7 +319,7 @@ def put_in_correct_output(robot, pass_or_fail_value, i_val):
 		move_to(robot, static_positions['second_robot_good_output'], comport)
 	else: #if pass_or_fail_value == 0:
 		outfile = open(log_file_name_and_location, 'a')
-		outfile.write('Part #' + str(i_val) + ' was bad\n')
+		outfile.write('Part #' + str(i_val - 1) + ' was bad\n')
 		outfile.close()
 		move_to(robot, static_positions['second_robot_bad_output'], comport)
 	open_gripper(robot)
@@ -457,10 +457,11 @@ while True:
 		outfile.close()
 		comport.write('B'.encode())
 
-	for i in range(num_cycles):
-		print("getting part #: " + str(i) + '\n')
+	for i in range(num_cycles + 2):
 		get_serial_status(comport)
-		put_part_into_welder_start_welder_and_get_next_part(walle, i, comport)
+		if i < 50:
+			print("getting part #: " + str(i+1) + '\n')
+			put_part_into_welder_start_welder_and_get_next_part(walle, i, comport)
 		if i % 2 == 1:
 			if i > 1:
 				while tester_1_pass_or_fail == 12:
