@@ -39,7 +39,7 @@ static_positions = {
 
 left_time_before_expire = (1657780000.0 - time.time())/86400.0
 if 1657780000.0 > time.time():
-    print('good to use for the remaining: ' + str(left_time) + ' days of temporary license')
+    print('good to use for the remaining: ' + str(left_time_before_expire) + ' days of temporary license')
 else:
     print('Temporary software license has expired.')
     stop_everything_on_enter = input('press enter to exit')
